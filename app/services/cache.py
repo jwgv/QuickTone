@@ -4,7 +4,7 @@ import time
 from collections import OrderedDict
 from dataclasses import dataclass
 from hashlib import blake2b
-from typing import Generic, MutableMapping, Optional, Tuple, TypeVar
+from typing import Generic, Iterable, MutableMapping, Optional, Tuple, TypeVar
 
 K = TypeVar("K")
 V = TypeVar("V")
@@ -60,4 +60,23 @@ class MemoryCache(Generic[K, V]):
         h.update(task_type.encode())
         h.update(b"|")
         h.update(text.encode())
+        return h.hexdigest()
+
+    @staticmethod
+    def hash_texts(model: str, task_type: str, texts: Iterable[str]) -> str:
+        """Stable hash for an ordered list of texts for a given model and task_type."""
+        h = blake2b(digest_size=16)
+        h.update(model.encode())
+        h.update(b"|")
+        h.update(task_type.encode())
+        h.update(b"|")
+        # include length to avoid ambiguity and iterate deterministically
+        count = 0
+        for t in texts:
+            count += 1
+            h.update(str(len(t)).encode())
+            h.update(b":")
+            h.update(t.encode())
+            h.update(b"|")
+        h.update(f"n={count}".encode())
         return h.hexdigest()

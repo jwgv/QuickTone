@@ -34,10 +34,10 @@ COPY PLAN.md README.md pyproject.toml ./
 # Copy built UI assets
 COPY --from=ui-build /ui/dist ./static/ui
 
-ENV FS_HOST=0.0.0.0 \
-    FS_PORT=8080 \
-    FS_MODEL_DEFAULT=vader \
-    FS_MODEL_WARM_ON_STARTUP=true
+ENV QT_HOST=0.0.0.0 \
+    QT_PORT=8080 \
+    QT_MODEL_DEFAULT=vader \
+    QT_MODEL_WARM_ON_STARTUP=true
 
 EXPOSE 8080
 

@@ -7,8 +7,8 @@ setup:
 	uv sync && uv run pre-commit install
 
 run:
-	#uv run uvicorn app.main:app --reload --host $${FS_HOST:-0.0.0.0} --port $${FS_PORT:-8080} --
-	uv run uvicorn app.main:app --workers 32  --host $${FS_HOST:-0.0.0.0} --port $${FS_PORT:-8080} --loop uvloop --http httptools
+	#uv run uvicorn app.main:app --reload --host $${QT_HOST:-0.0.0.0} --port $${QT_PORT:-8080} --
+	uv run uvicorn app.main:app --workers 32  --host $${QT_HOST:-0.0.0.0} --port $${QT_PORT:-8080} --loop uvloop --http httptools
 ui-install:
 	cd ui && (npm ci || npm i)
 

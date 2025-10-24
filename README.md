@@ -15,7 +15,7 @@ Quick start
      - pip install -r requirements.txt
   3) Run the API
      - uvicorn app.main:app --reload
-  4) Open http://localhost:8080/docs (or set FS_PORT)
+  4) Open http://localhost:8080/docs (or set QT_PORT)
 
 - UI (React + Vite + Tailwind)
   - Dev: make ui-dev (runs Vite on http://localhost:5173, proxies to API)
@@ -64,40 +64,40 @@ Endpoints (v1)
 
 Configuration (env vars)
 - Core
-  - FS_ENV: dev|test|prod (default: dev)
-  - FS_HOST: default 0.0.0.0
-  - FS_PORT: default 8080
-  - FS_MODEL_DEFAULT: vader|distilbert|distilbert-sst-2 (default: vader)
+  - QT_ENV: dev|test|prod (default: dev)
+  - QT_HOST: default 0.0.0.0
+  - QT_PORT: default 8080
+  - QT_MODEL_DEFAULT: vader|distilbert|distilbert-sst-2 (default: vader)
 
 - Auth
-  - FS_AUTH_MODE: none|api_key (default: none)
-  - FS_API_KEYS: comma-separated list of valid API keys
+  - QT_AUTH_MODE: none|api_key (default: none)
+  - QT_API_KEYS: comma-separated list of valid API keys
 
 - Limits & Performance
-  - FS_RATE_LIMIT_ENABLED: true|false (default: false)
-  - FS_RATE_LIMIT_RPS: integer (default: 10)
-  - FS_RESPONSE_TIMEOUT_MS: integer (default: 500)
-  - FS_BATCH_SIZE_LIMIT: integer (default: 32)
-  - FS_TEXT_LENGTH_LIMIT: integer (default: 2500)
+  - QT_RATE_LIMIT_ENABLED: true|false (default: false)
+  - QT_RATE_LIMIT_RPS: integer (default: 10)
+  - QT_RESPONSE_TIMEOUT_MS: integer (default: 500)
+  - QT_BATCH_SIZE_LIMIT: integer (default: 32)
+  - QT_TEXT_LENGTH_LIMIT: integer (default: 2500)
 
 - Caching
-  - FS_CACHE_BACKEND: none|memory (default: none)
-  - FS_CACHE_TTL_SECONDS: integer (default: 3600)
+  - QT_CACHE_BACKEND: none|memory (default: none)
+  - QT_CACHE_TTL_SECONDS: integer (default: 3600)
 
 - Models
-  - FS_MODEL_WARM_ON_STARTUP: true|false (default: true)
-  - FS_DISTILBERT_MODEL: HF model id (default: joeddav/distilbert-base-uncased-go-emotions-student)
-  - FS_DISTILBERT_SST_2_MODEL: HF model id (distilbert-base-uncased-finetuned-sst-2-english)
-  - FS_GRACEFUL_DEGRADATION: true|false (default: true)
-  - FS_EMO_SENT_THRESHOLD: float (default: 0.35)
-  - FS_EMO_SENT_EPSILON: float (default: 0.05)
+  - QT_MODEL_WARM_ON_STARTUP: true|false (default: true)
+  - QT_DISTILBERT_MODEL: HF model id (default: joeddav/distilbert-base-uncased-go-emotions-student)
+  - QT_DISTILBERT_SST_2_MODEL: HF model id (distilbert-base-uncased-finetuned-sst-2-english)
+  - QT_GRACEFUL_DEGRADATION: true|false (default: true)
+  - QT_EMO_SENT_THRESHOLD: float (default: 0.35)
+  - QT_EMO_SENT_EPSILON: float (default: 0.05)
 
 - Logging
-  - FS_LOG_LEVEL: info|debug|warning|error (default: info)
-  - FS_PERFORMANCE_LOGGING: true|false (default: true)
+  - QT_LOG_LEVEL: info|debug|warning|error (default: info)
+  - QT_PERFORMANCE_LOGGING: true|false (default: true)
 
 Auth usage
-- To enable API key auth, set FS_AUTH_MODE=api_key and FS_API_KEYS="key1,key2".
+- To enable API key auth, set QT_AUTH_MODE=api_key and QT_API_KEYS="key1,key2".
 - Send key in header X-API-Key: <key> or Authorization: Api-Key <key>.
 
 Notes

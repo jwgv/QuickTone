@@ -7,8 +7,8 @@ from app.main import app  # noqa: F401
 
 
 def get_port() -> int:
-    # Default port is 8080; can be overridden by FS_PORT env var
-    val = os.getenv("FS_PORT", "8080")
+    # Default port is 8080; can be overridden by QT_PORT env var
+    val = os.getenv("QT_PORT", "8080")
     try:
         return int(val)
     except ValueError:
@@ -16,7 +16,7 @@ def get_port() -> int:
 
 
 def get_host() -> str:
-    return os.getenv("FS_HOST", "0.0.0.0")
+    return os.getenv("QT_HOST", "0.0.0.0")
 
 
 if __name__ == "__main__":

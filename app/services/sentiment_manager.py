@@ -33,6 +33,13 @@ class SentimentManager:
             if self._settings.CACHE_BACKEND == "memory"
             else None
         )
+        self._batch_cache = (
+            MemoryCache[str, BatchSentimentResponse](
+                max_size=256, ttl_seconds=self._settings.CACHE_TTL_SECONDS
+            )
+            if self._settings.CACHE_BACKEND == "memory"
+            else None
+        )
 
     def _select_backend(self, model: Optional[ModelName]) -> str:
         return (model or self._settings.MODEL_DEFAULT).lower()
@@ -113,6 +120,16 @@ class SentimentManager:
             if len(t) > self._settings.TEXT_LENGTH_LIMIT:
                 raise ValueError("Text too long")
 
+        # Batch-level cache check (captures total_processing_time_ms as well)
+        model_choice = self._select_backend(req.model)
+        task_type: TaskType = req.task_type
+        cache_key: Optional[str] = None
+        if self._batch_cache:
+            cache_key = self._batch_cache.hash_texts(model_choice, task_type, texts)
+            cached = self._batch_cache.get(cache_key)
+            if cached:
+                return cached
+
         start = time.perf_counter()
 
         sem = asyncio.Semaphore(8)
@@ -127,6 +144,9 @@ class SentimentManager:
 
         results: List[SentimentResponse] = await asyncio.gather(*[_one(t) for t in texts])
         total_ms = int((time.perf_counter() - start) * 1000)
-        return BatchSentimentResponse(
+        resp = BatchSentimentResponse(
             results=results, total_processing_time_ms=total_ms, items_processed=len(results)
         )
+        if self._batch_cache and cache_key is not None:
+            self._batch_cache.set(cache_key, resp)
+        return resp
