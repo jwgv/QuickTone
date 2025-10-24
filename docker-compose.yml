@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - FS_HOST=0.0.0.0
+      - FS_PORT=8080
+      - FS_MODEL_DEFAULT=vader
+      - FS_MODEL_WARM_ON_STARTUP=true
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
+    #command: uvicorn app.main:app --workers 16  --host ${FS_HOST:-0.0.0.0} --port ${FS_PORT:-8080} --loop=uvloop --http=httptools
+    volumes:
+      - ./app:/app/app
+      - ./PLAN.md:/app/PLAN.md:ro
+      - ./README.md:/app/README.md:ro
+    restart: unless-stopped

@@ -1,0 +1,9 @@
+# Minimal dependencies required to run tests in CI (no heavyweight ML backends)
+fastapi>=0.115.0
+pydantic>=2.8.2
+pydantic-settings>=2.4.0
+vaderSentiment>=3.3.2
+transformers>=4.44.2
+httpx>=0.27.2
+pytest>=8.4.2
+pytest-asyncio>=0.24.0

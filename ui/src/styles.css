@@ -1,0 +1,45 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light theme defaults */
+  --color-base-bg: 248 250 252; /* slate-50 */
+  --color-base-card: 255 255 255; /* white */
+  --color-base-hover: 241 245 249; /* slate-100 */
+  --color-base-border: 226 232 240; /* slate-200 */
+  color-scheme: light;
+}
+
+html.dark {
+  --color-base-bg: 11 18 32; /* #0b1220 */
+  --color-base-card: 17 24 39; /* #111827 */
+  --color-base-hover: 22 32 51; /* #162033 */
+  --color-base-border: 36 48 71; /* #243047 */
+  color-scheme: dark;
+}
+
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
+    Cantarell, Noto Sans, sans-serif, Apple Color Emoji, Segoe UI Emoji;
+}
+
+.card {
+  @apply bg-base-card border border-base-border rounded-xl shadow-md;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center rounded-lg px-4 py-2 font-medium transition-colors;
+}
+
+.btn-primary {
+  @apply bg-primary-500 hover:bg-primary-600 text-white;
+}
+
+.input, .select, .textarea {
+  @apply bg-base-bg/60 border border-base-border rounded-lg px-3 py-2 outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500;
+}
+
+.label {
+  @apply text-sm text-slate-600 dark:text-slate-300;
+}

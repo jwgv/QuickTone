@@ -1,0 +1,53 @@
+[project]
+name = "quicktone"
+version = "0.1.0"
+description = "QuickTone — Real-time sentiment analysis API (FastAPI)"
+requires-python = ">=3.11"
+readme = "README.md"
+keywords = ["fastapi", "sentiment", "nlp", "transformers", "vader"]
+license = {text = "MIT"}
+dependencies = [
+    "fastapi>=0.119.1",
+    "httptools>=0.7.1",
+    "pydantic-settings>=2.11.0",
+    "uvicorn>=0.38.0",
+    "uvloop>=0.22.1",
+]
+
+[tool.black]
+line-length = 100
+target-version = ["py311", "py312", "py313"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+exclude = [".venv", "build", "dist"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-q"
+pythonpath = ["."]
+
+[dependency-groups]
+dev = [
+    "black>=25.9.0",
+    "fastapi>=0.119.1",
+    "flake8>=7.3.0",
+    "httpx>=0.28.1",
+    "isort>=7.0.0",
+    "mypy>=1.18.2",
+    "pydantic-settings>=2.11.0",
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "torch>=2.9.0",
+    "transformers>=4.57.1",
+    "uvicorn>=0.38.0",
+    "vadersentiment>=3.3.2",
+]
