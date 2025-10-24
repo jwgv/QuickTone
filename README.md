@@ -1,9 +1,9 @@
-QuickTone — Real-Time Sentiment Analysis API
+QuickTone - Real-Time Sentiment Analysis API
 
 QuickTone is a high-performance FastAPI service providing real-time and batch sentiment analysis with multiple backends:
 - VADER (default): ultra-fast, zero cold-start, CPU-only
 - DistilBERT (optional): higher quality, emotion-aware mapping to sentiment
-- DistilBERT-SST-2 (optional): higher quality, emotion-aware mapping to sentiment
+- DistilBERT-SST-2 (optional): faster, higher quality, emotion-aware mapping to sentiment
 
 The service exposes clean REST endpoints, optional API key auth, simple rate limiting, lazy model loading, and model warm-up.
 
@@ -41,7 +41,7 @@ Quick start
 
 Endpoints (v1)
 - POST /api/v1/sentiment
-  Request: { "text": str, "model"?: "vader"|"distilbert", "task_type"?: "sentiment"|"emotion" }
+  Request: { "text": str, "model"?: "vader"|"distilbert"|"distilbert-sst-2", "task_type"?: "sentiment"|"emotion" }
   Response: { model, sentiment, confidence, processing_time_ms, task_type }
 
   Example:
@@ -50,7 +50,7 @@ Endpoints (v1)
     -d '{"text": "I love this!", "model": "vader"}' | jq
 
 - POST /api/v1/sentiment/batch
-  Request: { "texts": list[str], "model"?: "vader"|"distilbert", "task_type"?: "sentiment"|"emotion" }
+  Request: { "texts": list[str], "model"?: "vader"|"distilbert"|"distilbert-sst-2"", "task_type"?: "sentiment"|"emotion" }
   Response: { results: list[SentimentResponse], total_processing_time_ms, items_processed }
 
 - POST /api/v1/models/warm
@@ -67,7 +67,7 @@ Configuration (env vars)
   - FS_ENV: dev|test|prod (default: dev)
   - FS_HOST: default 0.0.0.0
   - FS_PORT: default 8080
-  - FS_MODEL_DEFAULT: vader|distilbert (default: vader)
+  - FS_MODEL_DEFAULT: vader|distilbert|distilbert-sst-2 (default: vader)
 
 - Auth
   - FS_AUTH_MODE: none|api_key (default: none)
@@ -87,7 +87,7 @@ Configuration (env vars)
 - Models
   - FS_MODEL_WARM_ON_STARTUP: true|false (default: true)
   - FS_DISTILBERT_MODEL: HF model id (default: joeddav/distilbert-base-uncased-go-emotions-student)
-  - FS_DISTILBERT_SST_2_MODEL: HF model id (default: distilbert-base-uncased-finetuned-sst-2-english)
+  - FS_DISTILBERT_SST_2_MODEL: HF model id (distilbert-base-uncased-finetuned-sst-2-english)
   - FS_GRACEFUL_DEGRADATION: true|false (default: true)
   - FS_EMO_SENT_THRESHOLD: float (default: 0.35)
   - FS_EMO_SENT_EPSILON: float (default: 0.05)
@@ -108,36 +108,10 @@ Notes
 Development
 - Formatting: black + isort
 - Types: mypy (strict)
-- Tests: pytest; minimal tests provided under app/tests
+- Tests: pytest
 
-Project Layout
-quicktone/
-├── app/
-│   ├── main.py                  # ASGI app
-│   ├── api/
-│   │   └── v1/
-│   │       ├── routes_sentiment.py
-│   │       └── routes_models.py
-│   ├── core/
-│   │   ├── config.py
-│   │   ├── logging.py
-│   │   └── performance.py
-│   ├── models/
-│   │   ├── schema.py
-│   │   └── types.py
-│   ├── services/
-│   │   ├── vader_service.py
-│   │   ├── distilbert_service.py
-│   │   ├── sentiment_manager.py
-│   │   ├── model_loader.py
-│   │   └── cache.py
-│   └── tests/
-│       ├── test_api.py
-│       ├── test_manager.py
-│       └── test_vader.py
-├── Dockerfile
-├── docker-compose.yml
-├── Makefile
-├── pyproject.toml
-├── requirements.txt
-└── README.md
+CI/CD
+- Pre-commit hooks 
+  - Formatting, linting, type checking, testing
+- GitHub Actions 
+  - CI: Formatting, test, build
