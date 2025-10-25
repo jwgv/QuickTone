@@ -1,12 +1,12 @@
 export type SentimentRequest = {
   text: string
-  model?: 'vader' | 'distilbert' | 'distilbert-base-uncased-finetuned-sst-2-english'
+  model?: 'vader' | 'distilbert' | 'distilbert-sst-2'
   task_type?: 'sentiment' | 'emotion'
   threshold?: number
 }
 
 export type SentimentResponse = {
-  model: 'vader' | 'distilbert' | 'distilbert-base-uncased-finetuned-sst-2-english'
+  model: 'vader' | 'distilbert' | 'distilbert-sst-2'
   sentiment: string
   confidence: number
   processing_time_ms: number
@@ -16,7 +16,7 @@ export type SentimentResponse = {
 
 export type BatchSentimentRequest = {
   texts: string[]
-  model?: 'vader' | 'distilbert' | 'distilbert-base-uncased-finetuned-sst-2-english'
+  model?: 'vader' | 'distilbert' | 'distilbert-sst-2'
   task_type?: 'sentiment' | 'emotion'
   threshold?: number
 }
@@ -38,7 +38,8 @@ function headers(apiKey?: string) {
 export async function health() {
   const res = await fetch(`${API_BASE}/health`)
   if (!res.ok) throw new Error('Health check failed')
-  return res.json() as Promise<any>
+  const data = (await res.json()) as any
+  return data
 }
 
 export async function modelStatus() {
@@ -69,8 +70,11 @@ export async function analyze(req: SentimentRequest, apiKey?: string) {
   return res.json() as Promise<SentimentResponse>
 }
 
-export async function analyzeBatch(req: BatchSentimentRequest, onProgress?: (done: number, total: number) => void, apiKey?: string) {
-  // API is synchronous; we simulate progress for UI polish.
+export async function analyzeBatch(
+  req: BatchSentimentRequest,
+  onProgress?: (done: number, total: number) => void,
+  apiKey?: string
+) {
   onProgress?.(0, req.texts.length)
   const res = await fetch(`${API_BASE}/api/v1/sentiment/batch`, {
     method: 'POST',

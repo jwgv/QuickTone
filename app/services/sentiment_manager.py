@@ -97,10 +97,10 @@ class SentimentManager:
                 processing_time_ms=elapsed,
                 task_type=task_type,
             )
-        elif model_choice == "distilbert-base-uncased-finetuned-sst-2-english":
+        elif model_choice == "distilbert-sst-2":
             label, conf, elapsed = await self._distilbert_sst2.analyze(text, task_type=task_type)
             return SentimentResponse(
-                model="distilbert-base-uncased-finetuned-sst-2-english",
+                model="distilbert-sst-2",
                 sentiment=label,
                 confidence=conf,
                 processing_time_ms=elapsed,

@@ -1,7 +1,7 @@
 [project]
 name = "quicktone"
 version = "0.1.0"
-description = "QuickTone — Real-time sentiment analysis API (FastAPI)"
+description = "QuickTone - Real-time sentiment analysis API (FastAPI)"
 requires-python = ">=3.11"
 readme = "README.md"
 keywords = ["fastapi", "sentiment", "nlp", "transformers", "vader"]
@@ -12,6 +12,12 @@ dependencies = [
     "pydantic-settings>=2.11.0",
     "uvicorn>=0.38.0",
     "uvloop>=0.22.1",
+]
+
+[project.optional-dependencies]
+onnx = [
+    "onnxruntime>=1.17.0",
+    "optimum>=1.18.0",
 ]
 
 [tool.black]
