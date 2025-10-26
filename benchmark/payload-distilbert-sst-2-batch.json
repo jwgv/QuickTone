@@ -1,0 +1,17 @@
+{
+    "texts": [
+        "I love this!",
+        "I hate this!",
+        "I love this!",
+        "I hate this!",
+        "I love this!",
+        "I hate this!",
+        "I love this!",
+        "I hate this!",
+        "I love this!",
+        "I hate this!"
+    ],
+    "model": "distilbert-sst-2",
+    "task_type": "sentiment",
+    "threshold": 0.35
+}

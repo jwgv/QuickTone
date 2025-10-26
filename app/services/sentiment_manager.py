@@ -130,8 +130,32 @@ class SentimentManager:
             if cached:
                 return cached
 
+        model_choice = model_choice.lower()
+        # Use optimized HF batch pipeline for DistilBERT variants; VADER remains per-item.
+        if model_choice in {"distilbert", "distilbert-sst-2"}:
+            # Route to the appropriate DistilBERT service once for all texts
+            svc = self._distilbert if model_choice == "distilbert" else self._distilbert_sst2
+            labels_confs, total_ms = await svc.analyze_batch(texts, task_type=task_type)
+            # Build responses; assign per-item processing time as total batch time divided equally
+            per_item_ms = max(1, int(total_ms / max(1, len(labels_confs))))
+            results: List[SentimentResponse] = [
+                SentimentResponse(
+                    model=model_choice,
+                    sentiment=label,
+                    confidence=conf,
+                    processing_time_ms=per_item_ms,
+                    task_type=task_type,
+                )
+                for (label, conf) in labels_confs
+            ]
+            resp = BatchSentimentResponse(
+                results=results, total_processing_time_ms=total_ms, items_processed=len(results)
+            )
+            if self._batch_cache and cache_key is not None:
+                self._batch_cache.set(cache_key, resp)
+            return resp
+        # Fallback: per-item async analysis (e.g., VADER)
         start = time.perf_counter()
-
         sem = asyncio.Semaphore(8)
 
         async def _one(t: str) -> SentimentResponse:

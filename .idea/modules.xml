@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/fastsniff.iml" filepath="$PROJECT_DIR$/.idea/fastsniff.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/quicktone.iml" filepath="$PROJECT_DIR$/.idea/quicktone.iml" />
     </modules>
   </component>
 </project>

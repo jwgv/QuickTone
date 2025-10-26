@@ -51,6 +51,9 @@ class Settings(BaseSettings):
     GRACEFUL_DEGRADATION: bool = Field(default=True, alias="QT_GRACEFUL_DEGRADATION")
     USE_ONNX_RUNTIME: bool = Field(default=False, alias="QT_USE_ONNX_RUNTIME")
 
+    # Inference device
+    TORCH_DEVICE: str = Field(default="auto", alias="QT_TORCH_DEVICE")  # auto|cpu|mps|cuda
+
     # Logging & observability
     LOG_LEVEL: str = Field(default="info", alias="QT_LOG_LEVEL")
     PERFORMANCE_LOGGING: bool = Field(default=True, alias="QT_PERFORMANCE_LOGGING")

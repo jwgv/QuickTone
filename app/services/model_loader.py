@@ -7,6 +7,11 @@ from typing import Any, Dict, Optional
 from transformers import AutoTokenizer, TextClassificationPipeline, pipeline
 
 try:
+    import torch  # type: ignore
+except Exception:  # pragma: no cover - optional dependency
+    torch = None  # type: ignore
+
+try:
     from optimum.onnxruntime import ORTModelForSequenceClassification  # type: ignore
 except Exception:  # pragma: no cover - optional dependency
     ORTModelForSequenceClassification = None  # type: ignore
@@ -65,12 +70,41 @@ class ModelLoader:
                     except Exception:
                         # Fall back to transformers pipeline below
                         pass
+
                 # Standard transformers pipeline
+                # Resolve device according to settings.TORCH_DEVICE
+                def _resolve_device() -> object:
+                    dev = settings.TORCH_DEVICE.lower()
+                    if torch is None:
+                        return -1  # CPU
+                    if dev == "auto":
+                        try:
+                            if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                                return torch.device("mps")
+                        except Exception:
+                            pass
+                        if torch.cuda.is_available():
+                            return 0  # first CUDA device index
+                        return -1
+                    if dev == "mps":
+                        # use MPS if available else CPU
+                        try:
+                            if hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+                                return torch.device("mps")
+                        except Exception:
+                            pass
+                        return -1
+                    if dev == "cuda":
+                        return 0 if torch.cuda.is_available() else -1
+                    return -1
+
+                device_arg = _resolve_device()
                 return pipeline(
                     task="text-classification",
                     model=model_name,
                     top_k=None,
                     truncation=True,
+                    device=device_arg,
                 )
 
             # Loading can be blocking; offload to thread to avoid blocking event loop
