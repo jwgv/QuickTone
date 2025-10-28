@@ -1,0 +1,34 @@
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: quicktone
+  namespace: default
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/ingress: all
+        autoscaling.knative.dev/minScale: "0"
+        autoscaling.knative.dev/maxScale: "10"
+        run.googleapis.com/cpu-throttling: "true"
+    spec:
+      containerConcurrency: 80
+      timeoutSeconds: 300
+      containers:
+        - image: REGION-docker.pkg.dev/PROJECT_ID/GAR_REPO/quicktone:TAG
+          ports:
+            - containerPort: 8080
+          env:
+            - name: QT_ENV
+              value: "prod"
+            - name: QT_MODEL_DEFAULT
+              value: "vader"
+            - name: QT_MODEL_WARM_ON_STARTUP
+              value: "true"
+          resources:
+            limits:
+              cpu: "1"
+              memory: "512Mi"
+            requests:
+              cpu: "0.5"
+              memory: "256Mi"

@@ -200,3 +200,7 @@ QuickTone implements a multi-layered intelligent caching system designed for opt
   - Formatting, linting, type checking, testing
 - GitHub Actions
   - CI: Formatting, test, build
+  - Deploy: Google Cloud Run via `.github/workflows/deploy-cloudrun.yml`
+    - Requires repository Variables or Secrets: `GCP_PROJECT_ID`, `GCP_REGION`, `GAR_REPO`, `CLOUD_RUN_SERVICE`
+    - Authentication: either `GCP_SA_KEY` (JSON) or Workload Identity Federation using `GCP_WORKLOAD_IDENTITY_PROVIDER` and `GCP_SERVICE_ACCOUNT_EMAIL`
+    - See `google-cloud/README.md` for setup details

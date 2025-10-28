@@ -1,0 +1,86 @@
+name: Deploy to Google Cloud Run
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: 'Container image tag (defaults to the Git SHA)'
+        required: false
+  push:
+    branches: [ main, master, deploy-cloudrun ]
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: read
+  id-token: write  # for Workload Identity Federation (optional)
+
+env:
+  SERVICE: ${{ vars.CLOUD_RUN_SERVICE || secrets.CLOUD_RUN_SERVICE }}
+  REGION: ${{ vars.GCP_REGION || secrets.GCP_REGION }}
+  PROJECT_ID: ${{ vars.GCP_PROJECT_ID || secrets.GCP_PROJECT_ID }}
+  GAR_REPO: ${{ vars.GAR_REPO || secrets.GAR_REPO }} # e.g., quicktone
+  GAR_HOST: ${{ vars.GAR_HOST || format('{0}-docker.pkg.dev', (vars.GCP_REGION || secrets.GCP_REGION)) }}
+  IMAGE_TAG: ${{ inputs.image_tag || github.sha }}
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required env
+        run: |
+          test -n "$SERVICE" || (echo 'CLOUD_RUN_SERVICE not set' && exit 1)
+          test -n "$REGION" || (echo 'GCP_REGION not set' && exit 1)
+          test -n "$PROJECT_ID" || (echo 'GCP_PROJECT_ID not set' && exit 1)
+          test -n "$GAR_REPO" || (echo 'GAR_REPO not set' && exit 1)
+
+      - name: Google Auth (Workload Identity Federation)
+        if: ${{ secrets.GCP_SA_KEY == '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT_EMAIL }}
+
+      - name: Google Auth (Service Account Key)
+        if: ${{ secrets.GCP_SA_KEY != '' }}
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up gcloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker to use Artifact Registry
+        run: |
+          gcloud auth configure-docker $GAR_HOST --quiet
+
+      - name: Build and push container image
+        env:
+          IMAGE: ${{ env.GAR_HOST }}/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/quicktone:${{ env.IMAGE_TAG }}
+        run: |
+          echo "Building $IMAGE"
+          docker build -t "$IMAGE" .
+          docker push "$IMAGE"
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy "$SERVICE" \
+            --project "$PROJECT_ID" \
+            --region "$REGION" \
+            --image "$IMAGE" \
+            --platform managed \
+            --allow-unauthenticated \
+            --port 8080 \
+            --set-env-vars QT_ENV=prod,QT_MODEL_DEFAULT=vader,QT_MODEL_WARM_ON_STARTUP=true
+
+      - name: Show service URL
+        run: |
+          URL=$(gcloud run services describe "$SERVICE" --region "$REGION" --format='value(status.url)')
+          echo "Deployed to: $URL"
+          echo "SERVICE_URL=$URL" >> $GITHUB_OUTPUT
