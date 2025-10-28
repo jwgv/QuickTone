@@ -1,0 +1,47 @@
+# Macbook Pro M4 2025
+# No cache, distilbert-base-uncased-finetuned-sst-2-english
+# `brew install hey`
+hey -T "application/json" -m POST -n 50000 -c 1000 -D benchmark/payload-distilbert-sst-2.json http://127.0.0.1:8080/api/v1/sentiment
+
+Summary:
+  Total:	23.1847 secs
+  Slowest:	3.1680 secs
+  Fastest:	0.0232 secs
+  Average:	0.4409 secs
+  Requests/sec:	2156.5952
+
+  Total data:	5950000 bytes
+  Size/request:	119 bytes
+
+Response time histogram:
+  0.023 [1]	|
+  0.338 [8226]	|■■■■■■■■
+  0.652 [41065]	|■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+  0.967 [95]	|
+  1.281 [95]	|
+  1.596 [93]	|
+  1.910 [66]	|
+  2.225 [96]	|
+  2.539 [99]	|
+  2.853 [99]	|
+  3.168 [65]	|
+
+
+Latency distribution:
+  10% in 0.2549 secs
+  25% in 0.4012 secs
+  50% in 0.4263 secs
+  75% in 0.5240 secs
+  90% in 0.5573 secs
+  95% in 0.5642 secs
+  99% in 1.3513 secs
+
+Details (average, fastest, slowest):
+  DNS+dialup:	0.0003 secs, 0.0232 secs, 3.1680 secs
+  DNS-lookup:	0.0000 secs, 0.0000 secs, 0.0000 secs
+  req write:	0.0000 secs, 0.0000 secs, 0.0060 secs
+  resp wait:	0.4379 secs, 0.0230 secs, 3.1497 secs
+  resp read:	0.0026 secs, 0.0000 secs, 0.1415 secs
+
+Status code distribution:
+  [200]	50000 responses

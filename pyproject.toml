@@ -38,7 +38,8 @@ exclude = [".venv", "build", "dist"]
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-addopts = "-q"
+# Default pytest options: quiet output + coverage reports (XML for CI, term-missing for local visibility)
+addopts = "-q --cov=app --cov=main --cov-report=term-missing --cov-report=xml:coverage.xml --cov-report=html:htmlcov"
 pythonpath = ["."]
 
 [dependency-groups]

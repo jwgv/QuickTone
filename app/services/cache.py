@@ -53,22 +53,34 @@ class MemoryCache(Generic[K, V]):
         self._evict_if_needed()
 
     @staticmethod
-    def hash_text(model: str, task_type: str, text: str) -> str:
+    def hash_text(model: str, task_type: str, text: str, threshold: Optional[float] = None) -> str:
         h = blake2b(digest_size=16)
         h.update(model.encode())
         h.update(b"|")
         h.update(task_type.encode())
+        h.update(b"|")
+        # include threshold to differentiate cache entries when overridden by user
+        thr_str = "none" if threshold is None else f"{threshold:.10g}"
+        h.update(f"thr={thr_str}".encode())
         h.update(b"|")
         h.update(text.encode())
         return h.hexdigest()
 
     @staticmethod
-    def hash_texts(model: str, task_type: str, texts: Iterable[str]) -> str:
-        """Stable hash for an ordered list of texts for a given model and task_type."""
+    def hash_texts(
+        model: str, task_type: str, texts: Iterable[str], threshold: Optional[float] = None
+    ) -> str:
+        """Stable hash for an ordered list of texts for a given model and task_type.
+
+        Includes threshold so cache entries vary when user adjusts it.
+        """
         h = blake2b(digest_size=16)
         h.update(model.encode())
         h.update(b"|")
         h.update(task_type.encode())
+        h.update(b"|")
+        thr_str = "none" if threshold is None else f"{threshold:.10g}"
+        h.update(f"thr={thr_str}".encode())
         h.update(b"|")
         # include length to avoid ambiguity and iterate deterministically
         count = 0

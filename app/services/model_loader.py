@@ -16,7 +16,7 @@ try:
 except Exception:  # pragma: no cover - optional dependency
     ORTModelForSequenceClassification = None  # type: ignore
 
-from ..core.config import get_settings
+from ..core import config as config
 
 
 class ModelLoader:
@@ -35,7 +35,7 @@ class ModelLoader:
         return cls._instance
 
     async def get_emotion_pipeline(self, model_id: Optional[str] = None) -> Any:
-        settings = get_settings()
+        settings = config.get_settings()
         model_name = model_id or settings.DISTILBERT_MODEL
         # Fast path: avoid locking if already loaded
         pl = self._pipelines.get(model_name)
@@ -117,7 +117,7 @@ class ModelLoader:
 
         If model_ids is provided, warm exactly those HF model IDs; otherwise warm the default.
         """
-        settings = get_settings()
+        settings = config.get_settings()
         times: Dict[str, float] = {}
         if settings.MODEL_WARM_ON_STARTUP:
             ids = model_ids or [settings.DISTILBERT_MODEL]

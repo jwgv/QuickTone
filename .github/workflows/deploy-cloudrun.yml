@@ -77,7 +77,10 @@ jobs:
             --image "$IMAGE" \
             --platform managed \
             --allow-unauthenticated \
-            --port 8080 \
+            --timeout 1200 \
+            --cpu 2 \
+            --memory 4Gi \
+            --max-instances 10 \
             --set-env-vars QT_ENV=prod,QT_MODEL_DEFAULT=vader,QT_MODEL_WARM_ON_STARTUP=true
 
       - name: Show service URL

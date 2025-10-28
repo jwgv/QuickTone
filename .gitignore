@@ -1,2 +1,4 @@
 /ui/node_modules/
 /.venv/
+/.coverage
+/coverage.xml

@@ -50,7 +50,7 @@ class SentimentManager:
         task_type: TaskType = req.task_type
 
         if self._cache:
-            key = self._cache.hash_text(model_choice, task_type, text)
+            key = self._cache.hash_text(model_choice, task_type, text, req.threshold)
             hit = self._cache.get(key)
             if hit:
                 return hit
@@ -125,7 +125,7 @@ class SentimentManager:
         task_type: TaskType = req.task_type
         cache_key: Optional[str] = None
         if self._batch_cache:
-            cache_key = self._batch_cache.hash_texts(model_choice, task_type, texts)
+            cache_key = self._batch_cache.hash_texts(model_choice, task_type, texts, req.threshold)
             cached = self._batch_cache.get(cache_key)
             if cached:
                 return cached

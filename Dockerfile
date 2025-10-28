@@ -29,6 +29,7 @@ RUN pip install -r requirements.txt
 
 # Copy application
 COPY app ./app
+COPY main.py ./
 COPY README.md pyproject.toml ./
 
 # Copy built UI assets
@@ -41,4 +42,6 @@ ENV QT_HOST=0.0.0.0 \
 
 EXPOSE 8080
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+#CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Use the main.py script which reads PORT env var dynamically
+CMD ["python", "main.py"]
