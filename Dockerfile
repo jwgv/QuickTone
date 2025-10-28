@@ -29,7 +29,8 @@ RUN pip install -r requirements.txt
 
 # Copy application
 COPY app ./app
-COPY PLAN.md README.md pyproject.toml ./
+COPY main.py ./
+COPY README.md pyproject.toml ./
 
 # Copy built UI assets
 COPY --from=ui-build /ui/dist ./static/ui
@@ -37,8 +38,11 @@ COPY --from=ui-build /ui/dist ./static/ui
 ENV QT_HOST=0.0.0.0 \
     QT_PORT=8080 \
     QT_MODEL_DEFAULT=vader \
-    QT_MODEL_WARM_ON_STARTUP=true
+    QT_MODEL_WARM_ON_STARTUP=false \
+    QT_CACHE_BACKEND=memory
 
 EXPOSE 8080
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+#CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
+# Use the main.py script which reads PORT env var dynamically
+CMD ["python", "main.py"]

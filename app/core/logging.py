@@ -5,7 +5,7 @@ import logging
 import sys
 from typing import Any, Dict
 
-from .config import get_settings
+from . import config as config
 
 
 class JsonFormatter(logging.Formatter):
@@ -23,10 +23,13 @@ class JsonFormatter(logging.Formatter):
 
 
 def configure_logging() -> None:
-    settings = get_settings()
+    settings = config.get_settings()
     root = logging.getLogger()
     root.handlers.clear()
-    root.setLevel(getattr(logging, settings.LOG_LEVEL.upper(), logging.INFO))
+    # Map LOG_LEVEL robustly
+    level_name = (settings.LOG_LEVEL or "INFO").upper()
+    level = logging._nameToLevel.get(level_name, logging.INFO)  # type: ignore[attr-defined]
+    root.setLevel(level)
 
     handler = logging.StreamHandler(sys.stdout)
     if settings.ENV == "prod":

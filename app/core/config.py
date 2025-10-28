@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from functools import lru_cache
 
 from pydantic import BaseModel, Field
@@ -15,7 +16,9 @@ class Settings(BaseSettings):
 
     # Core
     ENV: str = Field(default="dev", alias="QT_ENV")
-    PORT: int = Field(default=8080, alias="QT_PORT")
+    PORT: int = Field(
+        default=int(os.environ.get("PORT", os.environ.get("QT_PORT", "8080"))), alias="QT_PORT"
+    )
     HOST: str = Field(default="0.0.0.0", alias="QT_HOST")
     MODEL_DEFAULT: str = Field(default="vader", alias="QT_MODEL_DEFAULT")  # vader|distilbert
 

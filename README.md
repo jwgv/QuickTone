@@ -170,11 +170,11 @@ Basic health info including version, default model, and available backends.
 - Hardware: MacBook Pro M4 Max (40-core GPU, 128GB RAM)
 - Command:
   ```bash
-  hey -T "application/json" -m POST -n 10000 -c 1000 \
+  hey -T "application/json" -m POST -n 50000 -c 1000 \
     -D benchmark/payload-distilbert-sst-2.json \
     http://127.0.0.1:8080/api/v1/sentiment
   ```
-- Results: ~**1,705 RPS** for 10,000 requests with 1,000 concurrent connections (no caching)
+- Results: ~**2,200 RPS** for 50,000 requests with 1,000 concurrent connections (no caching)
 
 ## Intelligent Caching
 QuickTone implements a multi-layered intelligent caching system designed for optimal performance in sentiment analysis workloads.
@@ -200,3 +200,7 @@ QuickTone implements a multi-layered intelligent caching system designed for opt
   - Formatting, linting, type checking, testing
 - GitHub Actions
   - CI: Formatting, test, build
+  - Deploy: Google Cloud Run via `.github/workflows/deploy-cloudrun.yml`
+    - Requires repository Variables or Secrets: `GCP_PROJECT_ID`, `GCP_REGION`, `GAR_REPO`, `CLOUD_RUN_SERVICE`
+    - Authentication: either `GCP_SA_KEY` (JSON) or Workload Identity Federation using `GCP_WORKLOAD_IDENTITY_PROVIDER` and `GCP_SERVICE_ACCOUNT_EMAIL`
+    - See `google-cloud/README.md` for setup details

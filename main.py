@@ -7,8 +7,8 @@ from app.main import app  # noqa: F401
 
 
 def get_port() -> int:
-    # Default port is 8080; can be overridden by QT_PORT env var
-    val = os.getenv("QT_PORT", "8080")
+    # Cloud Run sets PORT env var, fallback to QT_PORT, then default to 8080
+    val = os.getenv("PORT", os.getenv("QT_PORT", "8080"))
     try:
         return int(val)
     except ValueError:
@@ -20,4 +20,4 @@ def get_host() -> str:
 
 
 if __name__ == "__main__":
-    uvicorn.run("app.main:app", host=get_host(), port=get_port(), reload=True)
+    uvicorn.run("app.main:app", host=get_host(), port=get_port())

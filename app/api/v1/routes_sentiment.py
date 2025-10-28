@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
-from ...core.config import get_settings
+from ...core import config as config
 from ...models.schema import (
     BatchSentimentRequest,
     BatchSentimentResponse,
@@ -23,8 +23,9 @@ async def analyze_sentiment(
     _auth: None = Depends(api_key_auth),
     _limits: None = Depends(enforce_limits),
 ) -> SentimentResponse:
-    settings = get_settings()
-    if len(req.text) > settings.TEXT_LENGTH_LIMIT:
+    settings = config.get_settings()
+    text_limit = getattr(settings, "TEXT_LENGTH_LIMIT", 2500)
+    if len(req.text) > text_limit:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="Text too long"
         )
@@ -37,13 +38,15 @@ async def analyze_sentiment_batch(
     _auth: None = Depends(api_key_auth),
     _limits: None = Depends(enforce_limits),
 ) -> BatchSentimentResponse:
-    settings = get_settings()
-    if len(req.texts) > settings.BATCH_SIZE_LIMIT:
+    settings = config.get_settings()
+    batch_limit = getattr(settings, "BATCH_SIZE_LIMIT", 32)
+    text_limit = getattr(settings, "TEXT_LENGTH_LIMIT", 2500)
+    if len(req.texts) > batch_limit:
         raise HTTPException(
             status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="Batch too large"
         )
     for t in req.texts:
-        if len(t) > settings.TEXT_LENGTH_LIMIT:
+        if len(t) > text_limit:
             raise HTTPException(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE, detail="Text too long"
             )
