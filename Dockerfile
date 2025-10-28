@@ -29,7 +29,7 @@ RUN pip install -r requirements.txt
 
 # Copy application
 COPY app ./app
-COPY PLAN.md README.md pyproject.toml ./
+COPY README.md pyproject.toml ./
 
 # Copy built UI assets
 COPY --from=ui-build /ui/dist ./static/ui
