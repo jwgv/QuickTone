@@ -65,7 +65,7 @@ jobs:
           IMAGE: ${{ env.GAR_HOST }}/${{ env.PROJECT_ID }}/${{ env.GAR_REPO }}/quicktone:${{ env.IMAGE_TAG }}
         run: |
           echo "Building $IMAGE"
-          docker build -t "$IMAGE" .
+          docker build --platform linux/amd64 -t "$IMAGE" .
           docker push "$IMAGE"
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
 
@@ -81,7 +81,7 @@ jobs:
             --cpu 2 \
             --memory 4Gi \
             --max-instances 10 \
-            --set-env-vars QT_ENV=prod,QT_MODEL_DEFAULT=vader,QT_MODEL_WARM_ON_STARTUP=true
+            --set-env-vars QT_ENV=prod,QT_MODEL_DEFAULT=vader,QT_MODEL_WARM_ON_STARTUP=false,QT_CACHE_BACKEND=memory
 
       - name: Show service URL
         run: |

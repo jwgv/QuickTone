@@ -19,17 +19,29 @@ from .services.model_loader import ModelLoader
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    logger.info("Starting lifespan context")
     settings = get_settings()
     configure_logging()
     # Optional warm-up
     if settings.MODEL_WARM_ON_STARTUP:
+        logger.info(f"Starting model warm-up for: {settings.DISTILBERT_SST_2_MODEL}")
         try:
             loader = ModelLoader.instance()
             await loader.warm_up(model_ids=[settings.DISTILBERT_SST_2_MODEL])
-        except Exception:
+        except Exception as exc:
+            logger.error(f"Model warm-up failed: {exc}")
             # Warm-up failure should not crash app; graceful degradation will handle at runtime.
             pass
+    else:
+        logger.info("Model warm-up disabled")
+
+    logger.info("Lifespan startup completed")
     yield
+    logger.info("Lifespan shutdown completed")
 
 
 app = FastAPI(title="QuickTone", version=__version__, lifespan=lifespan)

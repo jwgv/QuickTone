@@ -38,7 +38,8 @@ COPY --from=ui-build /ui/dist ./static/ui
 ENV QT_HOST=0.0.0.0 \
     QT_PORT=8080 \
     QT_MODEL_DEFAULT=vader \
-    QT_MODEL_WARM_ON_STARTUP=true
+    QT_MODEL_WARM_ON_STARTUP=false \
+    QT_CACHE_BACKEND=memory
 
 EXPOSE 8080
 
