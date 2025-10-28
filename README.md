@@ -170,11 +170,11 @@ Basic health info including version, default model, and available backends.
 - Hardware: MacBook Pro M4 Max (40-core GPU, 128GB RAM)
 - Command:
   ```bash
-  hey -T "application/json" -m POST -n 10000 -c 1000 \
+  hey -T "application/json" -m POST -n 50000 -c 1000 \
     -D benchmark/payload-distilbert-sst-2.json \
     http://127.0.0.1:8080/api/v1/sentiment
   ```
-- Results: ~**1,705 RPS** for 10,000 requests with 1,000 concurrent connections (no caching)
+- Results: ~**2,200 RPS** for 50,000 requests with 1,000 concurrent connections (no caching)
 
 ## Intelligent Caching
 QuickTone implements a multi-layered intelligent caching system designed for optimal performance in sentiment analysis workloads.
