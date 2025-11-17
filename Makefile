@@ -17,6 +17,8 @@ run:
 	QT_CACHE_TTL_SECONDS=1800 \
 	QT_AUTH_MODE=api_key \
 	QT_API_KEYS=local \
+	QT_RATE_LIMIT_ENABLED=true \
+	QT_ADMIN_API_KEY=admin \
 	PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 \
 	QT_MODEL_WARM_ON_STARTUP=0 \
 	uv run uvicorn app.main:app \

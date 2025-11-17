@@ -25,6 +25,7 @@ class Settings(BaseSettings):
     # Auth
     AUTH_MODE: str = Field(default="none", alias="QT_AUTH_MODE")  # none|api_key
     API_KEYS: str = Field(default="", alias="QT_API_KEYS")  # comma-separated
+    ADMIN_API_KEY: str = Field(default="", alias="QT_ADMIN_API_KEY")
 
     # Performance & limits
     RATE_LIMIT_ENABLED: bool = Field(default=False, alias="QT_RATE_LIMIT_ENABLED")

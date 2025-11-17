@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends
 from ...core.config import get_settings
 from ...models.schema import ModelWarmupRequest, ModelWarmupResponse
 from ...services.model_loader import ModelLoader
-from ..deps import api_key_auth
+from ..deps import admin_key_auth
 
 router = APIRouter(prefix="/api/v1/models", tags=["models"])
 
@@ -18,7 +18,7 @@ _loader = ModelLoader.instance()
 @router.post("/warm", response_model=ModelWarmupResponse)
 async def warm_models(
     req: ModelWarmupRequest | None = None,
-    _auth: None = Depends(api_key_auth),
+    _admin: None = Depends(admin_key_auth),
 ) -> ModelWarmupResponse:
     start = time.perf_counter()
     # Determine which HF model IDs to warm based on requested logical model names
@@ -53,6 +53,8 @@ async def model_status() -> Dict[str, object]:
 
 
 @router.delete("/clear")
-async def clear_models(_auth: None = Depends(api_key_auth)) -> Dict[str, str]:
+async def clear_models(
+    _admin: None = Depends(admin_key_auth),
+) -> Dict[str, str]:
     await _loader.clear()
     return {"status": "cleared"}

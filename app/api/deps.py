@@ -25,6 +25,31 @@ def get_api_key(request: Request) -> Optional[str]:
     return api_key or None
 
 
+async def admin_key_auth(
+    # Hook into the same security scheme used for Swagger's Authorize button
+    api_key: Optional[str] = Security(api_key_header),
+    request: Request = None,
+) -> None:
+    """
+    Require the special admin/master key for sensitive operations when configured.
+    """
+    settings = get_settings()
+    master_key = getattr(settings, "ADMIN_API_KEY", "") or ""
+
+    # If not configured, do NOT enforce admin auth (useful for tests/dev)
+    if not master_key:
+        return
+
+    # Prefer the key from the security scheme (Swagger UI), but allow fallback
+    key = api_key or get_api_key(request)
+
+    if key != master_key:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing admin key",
+        )
+
+
 async def api_key_auth(
     # This creates a security scheme in OpenAPI and the “Authorize” box
     api_key: Optional[str] = Security(api_key_header),
@@ -32,17 +57,30 @@ async def api_key_auth(
 ) -> None:
     settings = get_settings()
     if settings.AUTH_MODE != "api_key":
+        # Auth disabled: allow everything
         return
 
     # Prefer the key from the security scheme (Swagger UI / client),
     # but fall back to header parsing for flexibility.
     key = api_key or get_api_key(request)
 
-    if not key or key not in settings.api_key_set:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or missing API key",
-        )
+    # Allow anonymous access; rate limiting enforces “anonymous vs keyed”.
+    if not key:
+        return
+
+    # Treat both regular API keys and the admin key as “valid” here.
+    admin_key = getattr(settings, "ADMIN_API_KEY", "") or ""
+    if key in settings.api_key_set or (admin_key and key == admin_key):
+        return
+
+    # Optional: for invalid explicit keys to error, uncomment:
+    # raise HTTPException(
+    #     status_code=status.HTTP_401_UNAUTHORIZED,
+    #     detail="Invalid API key",
+    # )
+
+    # For now, just allow; rate limiting will still apply for non-whitelisted keys.
+    return
 
 
 class RateLimiter:
@@ -82,5 +120,15 @@ def enforce_limits(request: Request) -> None:
     if request.method == "POST":
         # We'll do body size checks at schema level; basic header-based guard here is skipped.
         pass
-    if settings.RATE_LIMIT_ENABLED:
-        rate_limiter.check(request)
+
+    if settings.RATE_LIMIT_ENABLED and settings.AUTH_MODE == "api_key":
+        key = get_api_key(request)
+        master_key = getattr(settings, "ADMIN_API_KEY", "") or ""
+
+        # Master key: no rate limiting at all
+        if master_key and key == master_key:
+            return
+
+        # Anonymous or non-master key that isn't in the normal key set gets rate limited
+        if not key or key not in settings.api_key_set:
+            rate_limiter.check(request)

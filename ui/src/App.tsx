@@ -170,19 +170,50 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mt-2">
-                <div className="grid gap-1">
-                  <label className="label">API Key</label>
-                  <input className="input" type="password" placeholder="X-API-Key" value={apiKey} onChange={e => setApiKey(e.target.value)} />
-                </div>
-                <div className="grid gap-1">
-                  <label className="label">Text limit</label>
-                  <input className="input" type="number" min={1} step={1} value={limit} onChange={e => setLimit(Number(e.target.value) || TEXT_LIMIT_DEFAULT)} />
-                </div>
-                <div className="flex items-end">
-                  <button className="btn btn-primary w-full" disabled={loading || overLimit || text.trim().length === 0} onClick={onAnalyze}>{loading ? 'Analyzing…' : 'Analyze'}</button>
-                </div>
-              </div>
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mt-2">
+                    <div className="grid gap-1">
+                      <label className="label">API Key (Optional)</label>
+                      <input
+                        className="input"
+                        type="password"
+                        placeholder="X-API-Key"
+                        value={apiKey}
+                        onChange={e => setApiKey(e.target.value)}
+                      />
+                    </div>
+                    <div className="grid gap-1">
+                      <label className="label">Text limit</label>
+                      <input
+                        className="input"
+                        type="number"
+                        min={1}
+                        step={1}
+                        value={limit}
+                        onChange={e => setLimit(Number(e.target.value) || TEXT_LIMIT_DEFAULT)}
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        className="btn btn-primary w-full"
+                        disabled={loading || overLimit || text.trim().length === 0}
+                        onClick={onAnalyze}
+                      >
+                        {loading ? 'Analyzing…' : 'Analyze'}
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Small helper link under API key field */}
+                  <div className="mt-1 text-[11px] text-slate-400">
+                    <a
+                      href="https://forms.gle/tWm7cs9kPNz3i6ML7"
+                      target="_blank"
+                      rel="noreferrer"
+                      className="underline underline-offset-2 hover:text-primary-300"
+                    >
+                      Don&apos;t have an API key? Request one
+                    </a>
+                  </div>
             </div>
 
             {result && (
@@ -260,13 +291,23 @@ export default function App() {
             </div>
           </div>
 
-          <div className="card p-5">
-            <h3 className="font-semibold mb-3">Models</h3>
-            <div className="grid gap-2 text-sm">
-              <div className="flex items-center justify-between"><span className="text-slate-400">Loaded</span><span className="font-medium">{modelInfo?.loaded_models?.join(', ') || 'vader'}</span></div>
-              <div className="flex items-center justify-between"><span className="text-slate-400">Default</span><span className="font-medium">{modelInfo?.default_model || 'vader'}</span></div>
+            <div className="card p-5">
+                <h3 className="font-semibold mb-3">Models</h3>
+                <div className="grid gap-2 text-sm">
+                    <div className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 items-start">
+                        <span className="text-slate-400">Loaded</span>
+                        <span className="font-medium break-words">
+                          {modelInfo?.loaded_models?.join(', ') || 'vader'}
+                        </span>
+                    </div>
+                    <div className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 items-start">
+                        <span className="text-slate-400">Default</span>
+                        <span className="font-medium break-words">
+                      {modelInfo?.default_model || 'vader'}
+                    </span>
+                    </div>
+                </div>
             </div>
-          </div>
 
           <div className="card p-5">
             <h3 className="font-semibold mb-3">Tips</h3>
@@ -274,6 +315,7 @@ export default function App() {
               <li>Set a model override to compare VADER vs DistilBERT</li>
               <li>Warm models before batch for best latency</li>
               <li>Use API Docs for more parameters</li>
+              <li>Anonymous requests are rate-limited</li>
             </ul>
           </div>
         </aside>
