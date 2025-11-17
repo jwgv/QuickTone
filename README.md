@@ -55,7 +55,7 @@ High-performance FastAPI service for real-time and batch sentiment analysis with
 ### UI (React + Vite + Tailwind)
 - Dev: `make ui-dev` (runs Vite on http://localhost:5173, proxies to API)
 - Build: `make ui-build` (outputs to `ui/dist`)
-- In Docker: UI is built in the image and served at `/ui` by FastAPI
+- In Docker: UI is built in the image and served at `/` by FastAPI
 
 ### Makefile Helpers
 - `make setup`
@@ -76,7 +76,7 @@ docker run -p 8080:8080 quicktone:dev
 docker compose up --build
 ```
 - Visit API Docs: http://localhost:8080/docs
-- Visit UI: http://localhost:8080/ui
+- Visit UI: http://localhost:8080/
 
 ## API (v1)
 
