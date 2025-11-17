@@ -15,6 +15,7 @@ class DummySettings:
         self.EMO_SENT_THRESHOLD = 0.35
         self.EMO_SENT_EPSILON = 0.05
         self.DISTILBERT_MODEL = "dummy-model"
+        self.DISTILBERT_SST_2_MODEL = "distilbert-base-uncased-finetuned-sst-2-english"
         for k, v in kwargs.items():
             setattr(self, k, v)
 

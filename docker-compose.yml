@@ -4,15 +4,23 @@ services:
     build: .
     ports:
       - "8080:8080"
+    expose:
+      - "8080"
     environment:
       - QT_HOST=0.0.0.0
       - QT_PORT=8080
       - QT_MODEL_DEFAULT=vader
       - QT_MODEL_WARM_ON_STARTUP=true
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
-    #command: uvicorn app.main:app --workers 16  --host ${QT_HOST:-0.0.0.0} --port ${QT_PORT:-8080} --loop=uvloop --http=httptools
+      - QT_CACHE_BACKEND=none
+      - QT_UV_WORKERS=4
+    #command: uvicorn app.main:app --host 0.0.0.0 --port 8080 --reload
+    #command: uvicorn app.main:app --host ${QT_HOST:-0.0.0.0} --port ${QT_PORT:-8080} --loop auto --http=httptools --workers ${QT_UV_WORKERS:-2}
+    command: uvicorn app.main:app \
+      --host ${QT_HOST:-0.0.0.0} \
+      --port ${QT_PORT:-8080} \
+      --loop uvloop \
+      --workers ${QT_UV_WORKERS:-4}
+
     volumes:
       - ./app:/app/app
-      - ./PLAN.md:/app/PLAN.md:ro
-      - ./README.md:/app/README.md:ro
     restart: unless-stopped

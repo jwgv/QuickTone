@@ -43,6 +43,10 @@ ENV QT_HOST=0.0.0.0 \
 
 EXPOSE 8080
 
-#CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080"]
-# Use the main.py script which reads PORT env var dynamically
-CMD ["python", "main.py"]
+#CMD ["python", "main.py"]
+CMD ["sh", "-c", "uvicorn app.main:app \
+  --host 0.0.0.0 \
+  --port ${PORT:-8080} \
+  --workers ${QT_UV_WORKERS:-2} \
+  --loop uvloop \
+  --http httptools"]

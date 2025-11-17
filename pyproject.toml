@@ -12,6 +12,7 @@ dependencies = [
     "pydantic-settings>=2.11.0",
     "uvicorn>=0.38.0",
     "uvloop>=0.22.1",
+
 ]
 
 [project.optional-dependencies]
@@ -53,6 +54,7 @@ dev = [
     "pydantic-settings>=2.11.0",
     "pytest>=8.4.2",
     "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
     "torch>=2.9.0",
     "transformers>=4.57.1",
     "uvicorn>=0.38.0",

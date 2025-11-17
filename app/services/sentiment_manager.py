@@ -23,9 +23,7 @@ class SentimentManager:
         self._vader = VaderService()
         self._distilbert = DistilBertService()
         # DistilBERT SST-2 variant
-        self._distilbert_sst2 = DistilBertService(
-            model_id="distilbert-base-uncased-finetuned-sst-2-english"
-        )
+        self._distilbert_sst2 = DistilBertService(model_id=self._settings.DISTILBERT_SST_2_MODEL)
         self._cache = (
             MemoryCache[str, SentimentResponse](
                 max_size=2048, ttl_seconds=self._settings.CACHE_TTL_SECONDS

@@ -4,6 +4,11 @@ import asyncio
 import time
 from typing import Any, Dict, List, Tuple
 
+try:
+    import torch  # type: ignore
+except Exception:  # pragma: no cover - optional dependency
+    torch = None  # type: ignore
+
 from ..core import config as config
 from ..models.types import SentimentBackend, SentimentLabel, TaskType
 from .model_loader import ModelLoader
@@ -32,6 +37,12 @@ class DistilBertService(SentimentBackend):
         self._model_id = model_id  # if None, falls back to settings.DISTILBERT_MODEL
         self._pipeline: Any | None = None
 
+    def _is_sst2_model(self) -> bool:
+        """Return True if the effective HF model is the SST-2 sentiment model."""
+        settings = config.get_settings()
+        effective_id = self._model_id or settings.DISTILBERT_MODEL
+        return effective_id == settings.DISTILBERT_SST_2_MODEL
+
     async def _ensure_pipeline(self) -> Any:
         if self._pipeline is not None:
             return self._pipeline
@@ -41,6 +52,37 @@ class DistilBertService(SentimentBackend):
         return self._pipeline
 
     def _postprocess(self, results: List[dict], task_type: TaskType) -> tuple[str, float]:
+        # Special handling for SST-2: it is a pure sentiment model (POSITIVE/NEGATIVE).
+        if self._is_sst2_model():
+            if not results:
+                # Fallback to neutral if something is off
+                return SentimentLabel.neutral.value, 0.0
+
+            top = max(results, key=lambda x: x.get("score", 0.0))
+            raw_label = str(top.get("label", "")).strip()
+            score = float(top.get("score", 0.0))
+            label_lower = raw_label.lower()
+
+            # Map common SST-2 label variants to sentiment
+            if label_lower in {"positive", "pos", "label_1"}:
+                sentiment_label = SentimentLabel.positive.value
+            elif label_lower in {"negative", "neg", "label_0"}:
+                sentiment_label = SentimentLabel.negative.value
+            else:
+                sentiment_label = SentimentLabel.neutral.value
+
+            if task_type == "sentiment":
+                # Return raw sentiment for SST-2
+                return sentiment_label, score
+
+            # task_type == "emotion" → synthesize a crude "emotion" from sentiment
+            if sentiment_label == SentimentLabel.positive.value:
+                return "positivity", score
+            if sentiment_label == SentimentLabel.negative.value:
+                return "negativity", score
+            return "neutrality", score
+
+        # Eehavior for emotion models (GoEmotions, etc.)
         # results is list of {label: emotion, score: prob}
         if task_type == "emotion":
             top = max(results, key=lambda x: x.get("score", 0.0))
@@ -71,8 +113,14 @@ class DistilBertService(SentimentBackend):
         pipe = await self._ensure_pipeline()
 
         async def _run() -> List[dict] | List[List[dict]]:
-            loop = asyncio.get_running_loop()
-            return await loop.run_in_executor(None, lambda: pipe(text, truncation=True, top_k=None))
+            def _call_pipe() -> List[dict] | List[List[dict]]:
+                if torch is not None:
+                    with torch.inference_mode():
+                        return pipe(text, truncation=True, top_k=None)
+                return pipe(text, truncation=True, top_k=None)
+
+            # offload blocking inference to a thread
+            return await asyncio.to_thread(_call_pipe)
 
         # Guard extremely small timeouts to avoid hanging event loops in some environments
         if settings.RESPONSE_TIMEOUT_MS < 20:
@@ -113,11 +161,14 @@ class DistilBertService(SentimentBackend):
         pipe = await self._ensure_pipeline()
 
         async def _run_batch() -> List[List[dict]]:
+            def _call_pipe_batch() -> List[List[dict]] | List[dict]:
+                if torch is not None:
+                    with torch.inference_mode():
+                        return pipe(texts, truncation=True, top_k=None)
+                return pipe(texts, truncation=True, top_k=None)
+
             # HF pipelines accept a list of strings and return a list per input
-            loop = asyncio.get_running_loop()
-            result = await loop.run_in_executor(
-                None, lambda: pipe(texts, truncation=True, top_k=None)
-            )
+            result = await asyncio.to_thread(_call_pipe_batch)
             # Normalize to List[List[dict]]
             if isinstance(result, list) and result and isinstance(result[0], dict):
                 # Some pipelines may return list[dict] for single input; ensure nested
