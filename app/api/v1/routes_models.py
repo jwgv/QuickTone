@@ -8,7 +8,7 @@ from fastapi import APIRouter, Depends
 from ...core.config import get_settings
 from ...models.schema import ModelWarmupRequest, ModelWarmupResponse
 from ...services.model_loader import ModelLoader
-from ..deps import admin_key_auth
+from ..deps import admin_key_auth, api_key_auth, enforce_limits
 
 router = APIRouter(prefix="/api/v1/models", tags=["models"])
 
@@ -18,7 +18,8 @@ _loader = ModelLoader.instance()
 @router.post("/warm", response_model=ModelWarmupResponse)
 async def warm_models(
     req: ModelWarmupRequest | None = None,
-    _admin: None = Depends(admin_key_auth),
+    _auth: None = Depends(api_key_auth),
+    _limits: None = Depends(enforce_limits),
 ) -> ModelWarmupResponse:
     start = time.perf_counter()
     # Determine which HF model IDs to warm based on requested logical model names
@@ -40,7 +41,10 @@ async def warm_models(
 
 
 @router.get("/status")
-async def model_status() -> Dict[str, object]:
+async def model_status(
+    _auth: None = Depends(api_key_auth),
+    _limits: None = Depends(enforce_limits),
+) -> Dict[str, object]:
     settings = get_settings()
     # We don't track memory per model precisely without heavy deps; provide simple status
     loaded = list(getattr(_loader, "_pipelines", {}).keys())

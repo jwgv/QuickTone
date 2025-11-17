@@ -4,16 +4,16 @@ on:
   workflow_dispatch:
     inputs:
       image_tag:
-        description: 'Container image tag (defaults to the Git SHA)'
+        description: "Container image tag (defaults to the Git SHA)"
         required: false
   push:
-    branches: [ main, master, deploy-cloudrun ]
+    branches: [main, master, deploy-cloudrun]
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 permissions:
   contents: read
-  id-token: write  # for Workload Identity Federation (optional)
+  id-token: write # for Workload Identity Federation (optional)
 
 env:
   SERVICE: ${{ vars.CLOUD_RUN_SERVICE || secrets.CLOUD_RUN_SERVICE }}
@@ -23,7 +23,6 @@ env:
   GAR_HOST: ${{ vars.GAR_HOST || format('{0}-docker.pkg.dev', (vars.GCP_REGION || secrets.GCP_REGION)) }}
   IMAGE_TAG: ${{ inputs.image_tag || github.sha }}
   HAS_SA_KEY: ${{ secrets.GCP_SA_KEY != '' }}
-
 
 jobs:
   # --- Formatting: Black ---
@@ -35,7 +34,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
+          python-version: "3.13"
 
       - name: Run Black
         uses: psf/black@stable
@@ -84,8 +83,8 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
+          python-version: "3.11"
+          cache: "pip"
           cache-dependency-path: |
             requirements-ci.txt
 

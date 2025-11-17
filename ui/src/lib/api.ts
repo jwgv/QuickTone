@@ -48,10 +48,18 @@ export async function modelStatus() {
   return res.json() as Promise<any>
 }
 
-export async function warmModels(apiKey?: string) {
+export async function warmModels(
+  models?: ('distilbert' | 'distilbert-sst-2' | 'vader')[],
+  apiKey?: string
+) {
   const res = await fetch(`${API_BASE}/api/v1/models/warm`, {
     method: 'POST',
-    headers: headers(apiKey)
+    headers: headers(apiKey),
+    body: JSON.stringify(
+      models && models.length > 0
+        ? { models }        // e.g. { models: ["distilbert", "distilbert-sst-2"] }
+        : {}                // or omit list to let backend pick defaults
+    ),
   })
   if (!res.ok) throw new Error('Warm up failed')
   return res.json() as Promise<{ models_loaded: string[]; warm_up_time_ms: number }>

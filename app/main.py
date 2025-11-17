@@ -5,8 +5,10 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import AsyncIterator, Dict
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.staticfiles import StaticFiles
+
+from app.api.deps import api_key_auth, enforce_limits
 
 from . import __version__
 from .api.v1.routes_models import router as models_router
@@ -55,7 +57,10 @@ app.include_router(models_router)
 
 
 @app.get("/health")
-async def health() -> Dict[str, object]:
+async def health(
+    _auth: None = Depends(api_key_auth),
+    _limits: None = Depends(enforce_limits),
+) -> Dict[str, object]:
     settings = get_settings()
     return {
         "status": "healthy",
