@@ -3,9 +3,16 @@ from __future__ import annotations
 import time
 from typing import Optional
 
-from fastapi import HTTPException, Request, status
+from fastapi import HTTPException, Request, Security, status
+from fastapi.security import APIKeyHeader
 
 from ..core.config import get_settings
+
+# Define the API key header for docs + OpenAPI
+api_key_header = APIKeyHeader(
+    name="X-API-Key",
+    auto_error=False,
+)
 
 
 def get_api_key(request: Request) -> Optional[str]:
@@ -18,14 +25,23 @@ def get_api_key(request: Request) -> Optional[str]:
     return api_key or None
 
 
-def api_key_auth(request: Request) -> None:
+async def api_key_auth(
+    # This creates a security scheme in OpenAPI and the “Authorize” box
+    api_key: Optional[str] = Security(api_key_header),
+    request: Request = None,
+) -> None:
     settings = get_settings()
     if settings.AUTH_MODE != "api_key":
         return
-    key = get_api_key(request)
+
+    # Prefer the key from the security scheme (Swagger UI / client),
+    # but fall back to header parsing for flexibility.
+    key = api_key or get_api_key(request)
+
     if not key or key not in settings.api_key_set:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or missing API key"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or missing API key",
         )
 
 

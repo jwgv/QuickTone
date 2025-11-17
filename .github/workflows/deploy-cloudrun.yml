@@ -199,10 +199,23 @@ jobs:
             --cpu 2 \
             --memory 4Gi \
             --max-instances 10 \
-            --set-env-vars QT_ENV=prod,QT_MODEL_DEFAULT=vader,QT_MODEL_WARM_ON_STARTUP=false,QT_CACHE_BACKEND=memory
+            --set-env-vars QT_ENV=prod,QT_MODEL_DEFAULT=vader,QT_MODEL_WARM_ON_STARTUP=false,QT_CACHE_BACKEND=memory,QT_AUTH_MODE=api_key,QT_API_KEYS=${{ secrets.QT_API_KEY }}
 
       - name: Show service URL
         run: |
           URL=$(gcloud run services describe "$SERVICE" --region "$REGION" --format='value(status.url)')
           echo "Deployed to: $URL"
           echo "SERVICE_URL=$URL" >> $GITHUB_OUTPUT
+          echo "SERVICE_URL=$URL" >> $GITHUB_ENV
+      - name: Warm DistilBERT models
+        env:
+          QT_API_KEY: ${{ secrets.QT_API_KEY }}
+        run: |
+          echo "Warming DistilBERT models at: $SERVICE_URL"
+          curl -sS -X POST "$SERVICE_URL/api/v1/models/warm" \
+              -H "Content-Type: application/json" \
+              -H "X-API-Key: $QT_API_KEY" \
+              -d '{"models":["distilbert","distilbert-sst-2"]}' || {
+                echo "Model warm-up request failed"
+                exit 1
+              }

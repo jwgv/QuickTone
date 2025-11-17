@@ -168,7 +168,7 @@ export default function App() {
 
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3 mt-2">
                 <div className="grid gap-1">
-                  <label className="label">API Key (optional)</label>
+                  <label className="label">API Key</label>
                   <input className="input" type="password" placeholder="X-API-Key" value={apiKey} onChange={e => setApiKey(e.target.value)} />
                 </div>
                 <div className="grid gap-1">

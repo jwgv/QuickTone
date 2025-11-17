@@ -119,14 +119,21 @@ class ModelLoader:
         """
         settings = config.get_settings()
         times: Dict[str, float] = {}
-        if settings.MODEL_WARM_ON_STARTUP:
-            ids = model_ids or [settings.DISTILBERT_MODEL]
-            for mid in ids:
-                if mid in self._pipelines:
-                    continue
-                start = time.perf_counter()
-                _ = await self.get_emotion_pipeline(mid)
-                times[mid] = time.perf_counter() - start
+        if model_ids:
+            ids = model_ids
+        elif settings.MODEL_WARM_ON_STARTUP:
+            ids = [settings.DISTILBERT_MODEL]
+        else:
+            # No explicit models and startup warmup disabled – nothing to do.
+            return times
+
+        for mid in ids:
+            if mid in self._pipelines:
+                continue
+            start = time.perf_counter()
+            _ = await self.get_emotion_pipeline(mid)
+            times[mid] = time.perf_counter() - start
+
         return times
 
     async def clear(self) -> None:

@@ -15,7 +15,10 @@ run:
 	QT_GRACEFUL_DEGRADATION=true \
 	QT_BATCH_SIZE_LIMIT=32 \
 	QT_CACHE_TTL_SECONDS=1800 \
+	QT_AUTH_MODE=api_key \
+	QT_API_KEYS=local \
 	PYTORCH_MPS_HIGH_WATERMARK_RATIO=0.0 \
+	QT_MODEL_WARM_ON_STARTUP=0 \
 	uv run uvicorn app.main:app \
 		--workers $${QT_UV_WORKERS:-4} \
 		--host $${QT_HOST:-0.0.0.0} \
