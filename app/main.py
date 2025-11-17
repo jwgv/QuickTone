@@ -53,25 +53,6 @@ app.middleware("http")(performance_middleware)
 app.include_router(sentiment_router)
 app.include_router(models_router)
 
-# Static UI
-# Try Docker path first, then fall back to local development path
-_ui_dist_docker = Path(__file__).resolve().parent.parent / "static" / "ui"
-_ui_dist_local = Path(__file__).resolve().parent.parent / "ui" / "dist"
-
-_ui_dist = None
-if _ui_dist_docker.exists():
-    _ui_dist = _ui_dist_docker
-elif _ui_dist_local.exists():
-    _ui_dist = _ui_dist_local
-
-if _ui_dist:
-    app.mount("/ui", StaticFiles(directory=str(_ui_dist), html=True), name="ui")
-
-
-@app.get("/")
-async def root() -> Dict[str, str]:
-    return {"message": "QuickTone API — see /docs"}
-
 
 @app.get("/health")
 async def health() -> Dict[str, object]:
@@ -87,6 +68,21 @@ async def health() -> Dict[str, object]:
         "default_model": settings.MODEL_DEFAULT,
     }
 
+
+# Static UI
+# Try Docker path first, then fall back to local development path
+_ui_dist_docker = Path(__file__).resolve().parent.parent / "static" / "ui"
+_ui_dist_local = Path(__file__).resolve().parent.parent / "ui" / "dist"
+
+_ui_dist = None
+if _ui_dist_docker.exists():
+    _ui_dist = _ui_dist_docker
+elif _ui_dist_local.exists():
+    _ui_dist = _ui_dist_local
+
+if _ui_dist:
+    # Serve UI from the root path (/)
+    app.mount("/", StaticFiles(directory=str(_ui_dist), html=True), name="ui")
 
 # Convenience for local `python -m app.main`
 if __name__ == "__main__":
