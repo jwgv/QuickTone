@@ -180,13 +180,7 @@ export default function App() {
                   <input className="input" type="number" min={1} step={1} value={limit} onChange={e => setLimit(Number(e.target.value) || TEXT_LIMIT_DEFAULT)} />
                 </div>
                 <div className="flex items-end">
-                  <button
-                      className="btn btn-primary w-32" // fixed width
-                      disabled={loading || overLimit || text.trim().length === 0}
-                      onClick={onAnalyze}
-                  >
-                      {loading ? 'Analyzing…' : 'Analyze'}
-                  </button>
+                  <button className="btn btn-primary w-full" disabled={loading || overLimit || text.trim().length === 0} onClick={onAnalyze}>{loading ? 'Analyzing…' : 'Analyze'}</button>
                 </div>
               </div>
             </div>
