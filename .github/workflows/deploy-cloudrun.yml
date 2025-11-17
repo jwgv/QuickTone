@@ -200,7 +200,7 @@ jobs:
             --cpu 2 \
             --memory 4Gi \
             --max-instances 10 \
-            --set-env-vars QT_ENV=prod,QT_MODEL_DEFAULT=vader,QT_MODEL_WARM_ON_STARTUP=false,QT_CACHE_BACKEND=memory,QT_AUTH_MODE=api_key,QT_API_KEYS=${{ secrets.QT_API_KEY }},QT_RATE_LIMIT_ENABLED=${{ vars.QT_RATE_LIMIT_ENABLED }},QT_ADMIN_API_KEY=${{ secrets.QT_ADMIN_API_KEY }}
+            --set-env-vars ^:^QT_ENV=prod:QT_MODEL_DEFAULT=vader:QT_MODEL_WARM_ON_STARTUP=false:QT_CACHE_BACKEND=memory:QT_AUTH_MODE=api_key:QT_API_KEYS=${{ secrets.QT_API_KEY }}:QT_RATE_LIMIT_ENABLED=${{ vars.QT_RATE_LIMIT_ENABLED }}:QT_ADMIN_API_KEY=${{ secrets.QT_ADMIN_API_KEY }}
 
       - name: Show service URL
         run: |
