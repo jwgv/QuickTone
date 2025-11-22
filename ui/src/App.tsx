@@ -533,7 +533,7 @@ export default function App() {
             </main>
 
             <footer className="border-t border-base-border py-6 text-center text-xs text-slate-500">
-                Built with FastAPI • React • Tailwind
+                Built with FastAPI • React • Tailwind • © {new Date().getFullYear()} QuickTone
             </footer>
         </div>
     );
