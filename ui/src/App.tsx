@@ -30,7 +30,7 @@ function Header({
                     <div className="w-2.5 h-2.5 rounded-full bg-success animate-pulse"/>
                     <h1 className="text-lg font-semibold">QuickTone</h1>
                     <span className="text-xs text-slate-400 hidden sm:block">
-            Real-time sentiment API
+            Real-time sentiment analysis API
           </span>
                 </div>
                 <div className="flex items-center gap-3">
