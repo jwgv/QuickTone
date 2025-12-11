@@ -367,7 +367,7 @@ export default function App() {
 
                         {result && (
                             <div className="mt-5 grid gap-3">
-                                <div className="text-sm text-slate-300">Prediction</div>
+                                <div className="text-sm text-slate-600 dark:text-slate-300">Prediction</div>
                                 <div className="grid sm:grid-cols-3 gap-3">
                                     <div className="card p-4">
                                         <div className="text-xs text-slate-400">Sentiment</div>
@@ -412,7 +412,7 @@ export default function App() {
                                         .then(() => modelStatus().then(setModelInfo))
                                         .catch((err) => alert(err.message || "Warm-up failed"))
                                 }
-                                className="text-sm underline text-slate-300"
+                                className="text-sm underline text-slate-600 dark:text-slate-300 hover:text-primary-600 dark:hover:text-primary-300"
                             >
                                 Warm models
                             </button>
@@ -518,7 +518,7 @@ export default function App() {
 
                     <div className="card p-5">
                         <h3 className="font-semibold mb-3">Tips</h3>
-                        <ul className="list-disc list-inside text-sm text-slate-300 space-y-1">
+                        <ul className="list-disc list-inside text-sm text-slate-600 dark:text-slate-300 space-y-1">
                             <li>Set a model override to compare VADER vs DistilBERT</li>
                             <li>Warm models before batch for best latency</li>
                             <li>Use API Docs for more parameters</li>
